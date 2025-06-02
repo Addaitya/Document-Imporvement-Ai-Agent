@@ -327,6 +327,11 @@ $ docker compose up
 curl http://localhost:8000/suggestion?url=https://help.moengage.com/hc/en-us/articles/360042322691-User-Attribute-Profile-Integration-Validation
 ```
 Note: it take about 4-5 min to load the response
+
+- Open webpage at http://localhost:8000/static/index.html
+
+![alt text](images/webpage.png)
+
 ## Implementation
 1. Visit MoEngage article URL (https://help.moengage.com/hc/en-us/articles/...). It then downloads the article HTML content. 
 2. Converts article from html to markdown format.
@@ -340,7 +345,7 @@ Note: it take about 4-5 min to load the response
 
     d. **Generate final review:** All reviews generate for sections and consolidated and final review generate using llm.
 
-![alt text](graph.png)
+![alt text](images/graph.png)
 
 ## Challenges faced
 - Prompt Sensitivity: LLM responses varied based on minor prompt changes, requiring tuning for consistency.

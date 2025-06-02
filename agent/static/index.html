@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>URL Content Analyzer</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/markdown-it@13.0.1/dist/markdown-it.min.js"></script>
+  <style>
+    @keyframes pulse {
+      0% { transform: scale(1); opacity: 1; }
+      50% { transform: scale(1.05); opacity: 0.8; }
+      100% { transform: scale(1); opacity: 1; }
+    }
+    .pulse-animation {
+      animation: pulse 2s infinite;
+    }
+    @keyframes progress {
+      0% { width: 0%; }
+      100% { width: 100%; }
+    }
+    .progress-bar {
+      animation: progress 240s linear forwards; /* 4 minutes */
+    }
+  </style>
+</head>
+<body class="bg-gray-100 min-h-screen flex items-center justify-center">
+  <div class="container mx-auto p-4 max-w-3xl">
+    <h1 class="text-3xl font-bold text-center mb-6">URL Content Analyzer</h1>
+    
+    <!-- Input Form -->
+    <div class="mb-6">
+      <input 
+        type="text" 
+        id="urlInput" 
+        placeholder="Enter URL (e.g., https://help.moengage.com/hc/en-us/articles/...)" 
+        class="w-full p-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+      >
+      <button 
+        id="submitBtn" 
+        class="mt-2 w-full bg-blue-500 text-white p-2 rounded-md hover:bg-blue-600 transition"
+      >
+        Analyze URL
+      </button>
+    </div>
+
+    <!-- Loading Indicator -->
+    <div id="loading" class="hidden text-center text-gray-600 mb-4">
+      <svg class="animate-spin h-12 w-12 mx-auto text-blue-500 pulse-animation" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8h8a8 8 0 01-16 0z"></path>
+      </svg>
+      <p id="loadingMessage" class="mt-2 font-semibold">Initializing analysis...</p>
+      <div class="mt-4 w-full bg-gray-200 rounded-full h-4"> <!-- Increased thickness -->
+        <div id="progressBar" class="bg-blue-500 h-4 rounded-full" style="width: 0%"></div>
+      </div>
+      <p class="mt-2 text-sm text-gray-500">Estimated time: ~4-5 minutes</p>
+    </div>
+
+    <!-- Error Message -->
+    <div id="error" class="hidden text-red-600 text-center mb-4"></div>
+
+    <!-- Tabs Container -->
+    <div id="tabsContainer" class="hidden">
+      <div class="flex border-b">
+        <button class="tab-btn px-4 py-2 font-semibold text-gray-700 border-b-2 border-transparent hover:border-blue-500" data-tab="readability">Readability</button>
+        <button class="tab-btn px-4 py-2 font-semibold text-gray-700 border-b-2 border-transparent hover:border-blue-500" data-tab="completeness">Completeness</button>
+        <button class="tab-btn px-4 py-2 font-semibold text-gray-700 border-b-2 border-transparent hover:border-blue-500" data-tab="structure">Structure</button>
+        <button class="tab-btn px-4 py-2 font-semibold text-gray-700 border-b-2 border-transparent hover:border-blue-500" data-tab="style_guide">Style Guide</button>
+      </div>
+      <div id="tabContent" class="p-4 bg-white rounded-md shadow-md mt-2"></div>
+    </div>
+  </div>
+
+  <script>
+    const md = window.markdownit();
+    const urlInput = document.getElementById('urlInput');
+    const submitBtn = document.getElementById('submitBtn');
+    const loading = document.getElementById('loading');
+    const loadingMessage = document.getElementById('loadingMessage');
+    const progressBar = document.getElementById('progressBar');
+    const errorDiv = document.getElementById('error');
+    const tabsContainer = document.getElementById('tabsContainer');
+    const tabContent = document.getElementById('tabContent');
+    const tabButtons = document.querySelectorAll('.tab-btn');
+
+    let responseData = null;
+
+    // Validate URL format
+    function isValidUrl(url) {
+      return url.startsWith('https://help.moengage.com/hc/en-us/articles/');
+    }
+
+    // Show/hide elements
+    function showElement(element) {
+      element.classList.remove('hidden');
+    }
+
+    function hideElement(element) {
+      element.classList.add('hidden');
+    }
+
+    // Switch tabs
+    function switchTab(tab) {
+      tabButtons.forEach(btn => {
+        btn.classList.remove('border-blue-500', 'text-blue-700');
+        btn.classList.add('text-gray-700', 'border-transparent');
+      });
+      const activeBtn = document.querySelector(`.tab-btn[data-tab="${tab}"]`);
+      activeBtn.classList.add('border-blue-500', 'text-blue-700');
+      tabContent.innerHTML = responseData ? md.render(responseData[tab]) : '';
+    }
+
+    // Dynamic loading messages
+    const messages = [
+      'Analyzing URL content...',
+      'Checking readability metrics...',
+      'Evaluating content structure...',
+      'Assessing completeness...',
+      'Reviewing style guide adherence...',
+      'Almost done, finalizing results...'
+    ];
+    let messageIndex = 0;
+
+    function updateLoadingMessage() {
+      loadingMessage.textContent = messages[messageIndex];
+      messageIndex = (messageIndex + 1) % messages.length;
+    }
+
+    // Handle form submission
+    submitBtn.addEventListener('click', async () => {
+      const url = urlInput.value.trim();
+
+      if (!isValidUrl(url)) {
+        errorDiv.textContent = 'Please enter a valid URL starting with "https://help.moengage.com/hc/en-us/articles/"';
+        showElement(errorDiv);
+        hideElement(loading);
+        hideElement(tabsContainer);
+        return;
+      }
+
+      showElement(loading);
+      hideElement(errorDiv);
+      hideElement(tabsContainer);
+      submitBtn.disabled = true;
+
+      // Start progress bar and message updates
+      progressBar.classList.add('progress-bar');
+      messageIndex = 0;
+      updateLoadingMessage();
+      const messageInterval = setInterval(updateLoadingMessage, 30000); // Update every 30 seconds
+
+      try {
+        // Simulate API call (replace with actual endpoint)
+        const response = await fetch(`/suggestion?url=${url}`, {
+          method: 'GET',
+          headers: { 'Content-Type': 'application/json' }
+        });
+
+        if (!response.ok) {
+          throw new Error('Failed to fetch analysis');
+        }
+
+        responseData = await response.json();
+
+        // Validate response keys
+        const requiredKeys = ["readability", "structure", "completeness", "style_guide"];
+        if (!requiredKeys.every(key => key in responseData)) {
+          throw new Error('Invalid response format');
+        }
+
+        showElement(tabsContainer);
+        switchTab('readability'); // Default to first tab
+      } catch (error) {
+        errorDiv.textContent = `Error: ${error.message}`;
+        showElement(errorDiv);
+      } finally {
+        hideElement(loading);
+        submitBtn.disabled = false;
+        progressBar.classList.remove('progress-bar');
+        progressBar.style.width = '0%';
+        clearInterval(messageInterval);
+      }
+    });
+
+    // Tab click handlers
+    tabButtons.forEach(btn => {
+      btn.addEventListener('click', () => {
+        const tab = btn.getAttribute('data-tab');
+        switchTab(tab);
+      });
+    });
+  </script>
+</body>
+</html>
