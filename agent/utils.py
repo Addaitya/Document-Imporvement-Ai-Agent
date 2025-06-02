@@ -16,7 +16,7 @@ LLM_MODEL = os.getenv("LLM_MODEL")
 ##TODO: Add rate limiter to avoid hitting api limits
 
 
-# @lru_cache()
+@lru_cache()
 def get_llm(temperature: float = 0.6) -> ChatGroq:
     '''
     Return llm chat object

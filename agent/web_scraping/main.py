@@ -9,17 +9,18 @@ class WebScrapper:
     def __init__(self):
         if not BROWSER_URL:
             raise ValueError("Enviornment variable BROWSER_URL is None")
-        self.options = Options()  
-        self.options.add_argument("--no-sandbox")        
+        options = Options()  
+        options.add_argument("--no-sandbox")
+        self.driver = Remote(BROWSER_URL, options=options)
     
     def get_page(self, url: str) -> BeautifulSoup:
         """
         Fetch the article html content.
         """
         try:
-            driver = Remote(BROWSER_URL, options=self.options)
-            driver.get(url)
-            html = driver.page_source
+
+            self.driver.get(url)
+            html = self.driver.page_source
             page_soup = BeautifulSoup(html, 'html.parser')
             # driver.close()
             return page_soup
