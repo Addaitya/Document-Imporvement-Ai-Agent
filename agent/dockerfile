@@ -1,0 +1,14 @@
+FROM python:3.11.12-alpine
+
+WORKDIR /app
+
+RUN mkdir agent
+
+COPY agent/requirements.txt agent/requirements.txt
+
+RUN pip install --no-cache -r agent/requirements.txt
+
+COPY agent ./agent
+
+
+CMD ["uvicorn", "--host", "0.0.0.0", "--port", "8000", "agent.server:app"]

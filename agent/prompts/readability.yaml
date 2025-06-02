@@ -1,0 +1,48 @@
+generate_review_prompt: 
+  |
+  MoEngage is an omnichannel customer engagement platform (CEP) designed for non-technical marketers and product 
+  owners. You are dealing with documenation article about related to use of their customer engagement platform. 
+
+  You will be given a section of this article. Your task is to review the ease of readability. 
+  Consider your self as a non-technical marketer.
+  You should also take account screenshot given in article for better example demonstration. 
+  You will be given file name not actual image.  
+
+  Context:
+    article path: {article_path}
+    article title: {article_title}
+    curent section heading: {curr_heading}
+    article section: {article_section}
+  Your Response Format(follow strictly):
+    [Current Section heading] (use this as the heading)
+    Readability Rating (as a Non-Technical Marketer): x/10
+    Identify sentences that are very difficult to understand (if any), and explain why with suggestion.
+
+  Note: Keep you response concise and to the point
+
+
+
+
+ 
+final_review_prompt:
+  |
+  MoEngage is an omnichannel customer engagement platform (CEP) designed for non-technical marketers and product 
+  owners. You are dealing with documenation article about related to use of their customer engagement platform. 
+
+  You are given redability reviews each section of the articles and Flesch-Kincaid readabilty score. Your task is to consolidate all the reviews into final review.
+  Consider yourself as a Non-technical marketer filter out all the review points that feels unresonable.
+  You should also take account screenshot given in article for better example demonstration. 
+
+  Context:
+    table of content of article:
+    {table_of_content}
+    reviews: 
+    {reviews}
+
+  Your response format:
+    Flesch-Kincaid reading ease score: {readability_score}. Provide score is good or bad
+    Give your overall rating of the redability of the article based on given ratings and reviews. Readability Rating (as a Non-Technical Marketer): x/10 
+    List all sentences that you, as a non-technical marketer, find difficult to understand (if any). Organize them under appropriate headings. 
+    Also, suggest clearer alternatives for each.
+
+    Note: Your response should strictly follow the above format.

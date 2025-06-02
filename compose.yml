@@ -1,0 +1,36 @@
+services:
+  browser:
+    container_name: browser
+    image: selenium/standalone-firefox:4.0
+    ports:
+      - 4444:4444
+      - 7900:7900 
+
+    networks:
+      - agent_network
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:4444 || exit 1"]
+      interval: 10s
+      retries: 5
+      start_period: 30s
+      timeout: 10s
+  
+  agent:
+    container_name: agent
+    build: 
+      context: .
+      dockerfile: agent/dockerfile
+    ports: 
+     - 8000:8000
+    env_file:
+      - agent/.env
+    depends_on:
+      browser:
+        condition: service_healthy
+    networks:
+      - agent_network
+
+
+networks:
+  agent_network:
+    driver: bridge

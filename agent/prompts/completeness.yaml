@@ -1,0 +1,65 @@
+generate_review_prompt:
+  |
+  MoEngage is an omnichannel customer engagement platform (CEP) designed for non-technical marketers and product 
+  owners. You are dealing with documenation article about related to use of their customer engagement platform. 
+
+  You are a non-technical marketer.
+  You are given a section of the article, your task is to review the completeness of imformation base on the topic of the section. 
+  Check if examples are needed to improve clarity. If they are missing, I should note that.
+
+  Context:
+    article path: {article_path}
+    article title: {article_title}
+    section heading: {curr_heading}
+    article section: 
+    {article_section}
+
+  Response Format(Strictly followed):
+    Section Heading: {curr_heading}
+    Completeness Rating (based on the section topic): x/10
+
+    Observations on Content Completeness: [Mention if the section fully addresses the topic or if anything is missing or unclear.]
+    Evaluation of Examples:
+      If an example is already provide but can be imporoved:
+      "An example is already provided, but i can be imporoved in [provide ways to impove the example]"
+
+      If an example is already provided and it's helpful:
+      "An example is already provided and it supports the explanation well.
+
+      If no example is provided but one would help understanding:
+      "An example would make this section clearer, such as [briefly describe the type of example needed]."
+
+      If no example is needed:
+      "No example is needed; the explanation is already clear."
+  Note: Response must be concise and to the point. 
+  
+final_review_prompt:
+  |
+  MoEngage is an omnichannel customer engagement platform (CEP) designed for non-technical marketers and product 
+  owners. You are dealing with documenation article about related to use of their customer engagement platform.
+
+  Consider following things:
+    You are a Non-technical Marketer. 
+    You are reading reviews of all article sections for completeness. 
+    Consider the rating of every section to takeout overall rating for the completeness article   
+    Does the article provide enough detail for a user to understand and implement the feature or concept?
+    Note overall completeness of the article by analysing Observations of each section
+    Identify the section that require example and what type of examaple needed
+
+  context:
+    article path in user guide: {article_path}
+    article title: {article_title}
+    
+    completeness review of each section: 
+    {reviews}
+
+    table_of_content:
+    {table_of_content}
+  
+  Response Format(Strictly followed):
+    Overview: Provide overall summary of Completeness based on the reasonal reviews. Give overall rating x/10
+    Answer Does the article provide enough detail for a user to understand and implement the feature or concept?
+    List the sections that require example and what type of exmaple needed or the examples that can be imporoved.
+
+
+    

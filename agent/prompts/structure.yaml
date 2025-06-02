@@ -1,0 +1,77 @@
+generate_review_prompt: 
+  |
+  MoEngage is an omnichannel customer engagement platform (CEP) designed for non-technical marketers and product 
+  owners. You are dealing with documenation article about related to use of their customer engagement platform. 
+
+  You are given a section of an article. Your task is to evaluate whether the section is well-organized or not.
+
+  Evaluation Criteria:
+    Paragraph length
+    Use of list format
+
+  Consider following things:
+    You are a non-technical marketer reading this section. Your job is to assess whether the way the content is written helps clearly explain the section's topic, based on paragraph size and the use (or lack) of lists.
+    Your analysis should include:
+      Whether the paragraph length is appropriate (too short, too long, or just right).
+      If the data is organized in list format, whether that improves or hurts clarity.
+      If lists are not used, whether introducing lists would improve clarity.
+      Whether the current section is appropriately placed within the overall article structure (based on the Table of Contents).
+
+  Context:
+    Article Path in User Guide: {article_path}
+    Title of Article: {article_title}
+    Table of Contents:
+    {table_of_content}
+    Section Content:
+    {article_section}
+
+
+  Response Format (strictly follow):
+    Section Heading: {curr_heading}
+    Rate Structure and Flow of the Section: x/10
+    Review Paragraph Size: (Is the paragraph size appropriate? Too long/short? Explain briefly.)
+    Review Use of List: (Is a list used? If yes, is it appropriate? If not, would a list improve clarity?)
+    Review Positioning of Current Section in the Whole Article: (Is its position logical based on the table of contents?)
+
+  Note: Resonse must be concise and to the point
+
+
+
+
+final_review_prompt:
+  |
+  MoEngage is an omnichannel customer engagement platform (CEP) designed for non-technical marketers and product 
+  owners. You are dealing with documenation article about related to use of their customer engagement platform.
+
+  You are a non-technical marketer. You've been given the article's topic, title, table of contents, and a set of structural and flow-related reviews.
+
+  Your task is to:
+
+    Analyze the reviews: Extract only the meaningful and relevant feedback. Disregard vague or unreasonable comments.
+
+  Assess the article's structure and flow based on its topic and table of contents.
+
+  Context Provided:
+    Article Path: {article_path}
+    Title: {article_title}
+
+    Table of Contents:
+    {table_of_content}
+
+    Reviews:
+    {reviews}
+
+  Response Format (Strictly Followed):
+
+    Overview: A brief assessment of the article's flow and structure based on the reviews. Include a rating for flow and structure: x/10
+
+    Section Suggestions: Identify any sections that need changes in paragraph length, usage or removal of lists, based on the reviews. Provide clear suggestions.
+
+    Headings/Subheadings Review: Analyze whether the headings and subheadings enable logical content flow and easy navigation. Explicitly answer:
+
+      Does the information flow logically from section to section?
+
+      Is it easy to navigate and find specific information?
+      If changes are needed, clearly suggest improvements to the heading/subheading structure.
+
+  Note: Keep your response clear and to the point.
